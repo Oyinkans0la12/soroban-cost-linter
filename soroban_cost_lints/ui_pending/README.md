@@ -27,9 +27,6 @@ adapting to the pinned `nightly-2026-04-16` rustc API (the usual drift:
 
 | lint | implementation to restore from |
 | --- | --- |
-| `blind_storage_write` | `8659a92` |
-| `bytes_slice_copy_in_loop` | `04d5b1b` |
-| `excessive_vec_capacity` | `833d958` |
 | `nested_loop_storage_access` | `49101f5` |
 | `redundant_val_conversion` | `1aa0baf` |
 | `std_collection_in_contract` | `a77f614` |
