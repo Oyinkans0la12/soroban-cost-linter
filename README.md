@@ -25,7 +25,7 @@ Writing `env.storage().instance().set()` inside a `for` loop is mathematically g
 
 ## Features
 
-The linter runs as a Dylint library against the Rust compiler's HIR to catch specific Soroban anti-patterns (with a single early AST pass for the `format_args!` nodes the HIR no longer exposes). Forty-one lints ship in `v0.1.1`:
+The linter runs as a Dylint library against the Rust compiler's HIR to catch specific Soroban anti-patterns (with a single early AST pass for the `format_args!` nodes the HIR no longer exposes). Forty-two lints ship in `v0.1.1`:
 
 *   **[`soroban_storage_in_loop`](docs/lints/soroban_storage_in_loop.md):** Flags storage read/write operations placed inside loop bodies, suggesting memory aggregation instead.
 *   **[`redundant_env_clone`](docs/lints/redundant_env_clone.md):** Detects unnecessary `.clone()` calls on the Soroban `Env` object.
@@ -63,8 +63,8 @@ The fastest way to get a working environment is the pre-built container image, w
 the exact nightly toolchain, compiler components, and Dylint binaries installed — no manual setup required.
 
 ```bash
-docker pull ghcr.io/Tollcraft/soroban-cost-linter:latest
-docker run --rm -it -v "$(pwd)":/workspace ghcr.io/Tollcraft/soroban-cost-linter:latest bash
+docker pull ghcr.io/tollcraft/soroban-cost-linter-dev:latest
+docker run --rm -it -v "$(pwd)":/workspace ghcr.io/tollcraft/soroban-cost-linter-dev:latest bash
 # Inside the container:
 cargo test --workspace
 ```
@@ -300,16 +300,25 @@ LL |     let _cloned = env.clone();
    = help: pass `Env` by reference or value instead of cloning
    = note: `#[warn(redundant_env_clone)]` on by default
 
-lint summary:
-  redundant_env_clone: 1
-  soroban_storage_in_loop: 3
-  unnecessary_host_function_call: 2
-total: 6
+Found 3 cost lint findings:
+  By lint name:
+    - redundant_env_clone: 1
+    - soroban_storage_in_loop: 1
+    - unnecessary_host_function_call: 1
+  By severity:
+    - warning: 3
 ```
+
+The text-mode run above closes with a per-lint findings summary. That roll-up
+is printed whenever a text run applies a filter — either `--diff-only` or a
+discovered `.lintignore`. A plain `cargo cost-lint` passes rustc's own
+diagnostics through verbatim and omits the summary, and `--quiet` suppresses it
+too; `--format json`, `sarif` and `github` never emit it, so their output stays
+machine-parseable.
 
 For detailed examples of each lint and instructions on suppressing false positives, see the [`docs/lints/`](docs/lints) directory.
 
-For instructions on CI/CD integration, configuring the `budget.toml` file, and setting a maximum warnings threshold, see the [Integration Guide](docs/integration.md).
+For instructions on CI/CD integration and configuring the `budget.toml` file, see the [Integration Guide](docs/integration.md).
 
 
 ## Contributing
